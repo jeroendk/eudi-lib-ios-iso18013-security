@@ -13,8 +13,8 @@ not assert EU notification or wallet certification.
 
 The default SwiftPM manifest selects the fixed GitHub release URL and checksum
 recorded in `GBO-ETSI-ARTIFACT.json`. It does not require an ignored framework
-in a consumer's checkout. That release is prepared locally but **not published**;
-remote resolution remains a release gate before these source tags are published.
+in a consumer's checkout. The release is public and its downloaded archive has been checked against
+the pinned checksum.
 
 For unpublished development, explicitly set `GBO_USE_LOCAL_ETSI_FRAMEWORK=1`
 and extract the verified archive into this repository, producing
