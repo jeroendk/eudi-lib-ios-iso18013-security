@@ -10,3 +10,6 @@ DerivedData/
 /fastlane/test_output
 fastlane/report.xml
 /xcov_output
+
+# Generated from the GBO KMP source.
+/EudiEtsi1196x2.xcframework/
