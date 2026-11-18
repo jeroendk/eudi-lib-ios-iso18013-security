@@ -23,8 +23,11 @@ import EudiEtsi1196x2
 /// This centralizes the LoTE pipeline parameters so that the core can build the ETSI
 /// trust source internally, eliminating the need for consumers to construct the ETSI
 /// library plumbing themselves.
+public enum LoTEProfile: Sendable { case eu, gboDemo }
+
 public struct EtsiTrustSource: @unchecked Sendable {
     /// The LoTE download locations (e.g., PID, PubEAA, WRPAC provider URLs).
+    public let profile: LoTEProfile
     public let loteLocations: SupportedLists<NSString>
     // verification context mappings (doc type to etsi context)
     public let contextTypeMappings: EtsiContextTypeMappings?
@@ -57,6 +60,7 @@ public struct EtsiTrustSource: @unchecked Sendable {
 
     public init(
         loteLocations: SupportedLists<NSString>,
+        profile: LoTEProfile = .eu,
         contextTypeMappings: EtsiContextTypeMappings? = nil,
         cacheTtlHours: TimeInterval = EtsiTrustSource.defaultCacheTtlHours,
         customJwtSignatureVerifier: (any VerifyJwtSignature)? = nil,
@@ -65,6 +69,7 @@ public struct EtsiTrustSource: @unchecked Sendable {
         revocationPolicy: PkixRevocationPolicy = .ocspOnly,
         crlChecker: (any CheckRevocationIos)? = nil
     ) {
+        self.profile = profile
         self.loteLocations = loteLocations
         self.contextTypeMappings = contextTypeMappings
         self.cacheTtlHours = cacheTtlHours
@@ -80,6 +85,7 @@ public struct EtsiTrustSource: @unchecked Sendable {
     @available(*, deprecated, message: "Use init(loteLocations:contextTypeMappings:cacheTtlHours:customJwtSignatureVerifier:loadLoTE:loteConstraints:revocationPolicy:) instead")
     public init(
         loteLocations: SupportedLists<NSString>,
+        profile: LoTEProfile = .eu,
         contextTypeMappings: EtsiContextTypeMappings? = nil,
         cacheTtlHours: TimeInterval = EtsiTrustSource.defaultCacheTtlHours,
         customJwtSignatureVerifier: (any VerifyJwtSignature)? = nil,
@@ -89,6 +95,7 @@ public struct EtsiTrustSource: @unchecked Sendable {
     ) {
         self.init(
             loteLocations: loteLocations,
+            profile: profile,
             contextTypeMappings: contextTypeMappings,
             cacheTtlHours: cacheTtlHours,
             customJwtSignatureVerifier: customJwtSignatureVerifier,

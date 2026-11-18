@@ -24,6 +24,7 @@ public final class EtsiTrustManager: @unchecked Sendable {
     // Type-erased validation over the selected trust source; returns `nil` if validation throws
     // or the context is unsupported. Bridges the two validator kinds (cached LoTE vs. bundled
     // anchors), which the `EudiEtsi1196x2` API exposes through different entry points.
+    private let gboDemoProfile: Bool
     private let cachedValidator: CachedTrustValidator?
     private let validateChain: ([Data], any VerificationContext) async -> IosValidationResult?
     let contextTypeMappings: EtsiContextTypeMappings?
@@ -47,6 +48,7 @@ public final class EtsiTrustManager: @unchecked Sendable {
     /// - defaultVerificationContext
     /// - `fallback`: an optional manager used to validate the chain when this manager has no  verification context for the requested doc type.
     public init(source: TrustSource, defaultVerificationContext: (any VerificationContext)? = nil, fallback: EtsiTrustManager? = nil) {
+        if case .etsi(let etsi) = source { gboDemoProfile = etsi.profile == .gboDemo } else { gboDemoProfile = false }
         contextTypeMappings = source.contextTypeMappings
         self.defaultVerificationContext = defaultVerificationContext
         self.fallback = fallback
@@ -65,8 +67,15 @@ public final class EtsiTrustManager: @unchecked Sendable {
             let verifyJwtSignature: VerifyJwtSignature = etsi.customJwtSignatureVerifier ?? x5cVerifyJwtOrCwt.shared
             let directTrust = ValidateCertificateChainUsingDirectTrustIosKt.ValidateCertificateChainUsingDirectTrustIos
             let pkix = etsi.revocationPolicy.pkixValidator(crlChecker: etsi.crlChecker)
-            let validator = if let loadLoTE = etsi.loadLoTE {
-                EudiwIosTrust.shared.cached(
+            let validator: CachedTrustValidator
+            if etsi.profile == .gboDemo {
+                precondition(etsi.customJwtSignatureVerifier != nil && etsi.loadLoTE != nil, "GBO profile requires an independent verifier and loader")
+                validator = EudiwIosTrust.shared.cachedGboDemo(
+                    urls: urls, ttlHours: etsi.cacheTtlHours, verifyJwtSignature: verifyJwtSignature,
+                    loadLoTE: etsi.loadLoTE!, directTrust: directTrust, pkix: pkix
+                )
+            } else if let loadLoTE = etsi.loadLoTE {
+                validator = EudiwIosTrust.shared.cached(
                     urls: urls,
                     ttlHours: etsi.cacheTtlHours,
                     verifyJwtSignature: verifyJwtSignature,
@@ -75,7 +84,7 @@ public final class EtsiTrustManager: @unchecked Sendable {
                     pkix: pkix
                 )
             } else {
-                EudiwIosTrust.shared.cached(
+                validator = EudiwIosTrust.shared.cached(
                     urls: urls,
                     ttlHours: etsi.cacheTtlHours,
                     verifyJwtSignature: verifyJwtSignature,
@@ -134,7 +143,7 @@ public final class EtsiTrustManager: @unchecked Sendable {
     /// (e.g. PID, Wallet, WRPAC). `EtsiTrustManager` uses it as its single trust context.
     public func getVerificationContext() -> (any VerificationContext)? {
         if let contextTypeMappings, let docType {
-            guard let contType = contextTypeMappings[docType] else { return nil }
+            guard let contType = contextTypeMappings[docType] else { return gboDemoProfile ? VerificationContextPubEAA.shared : nil }
             return contType.verificationContext
         }
         return defaultVerificationContext

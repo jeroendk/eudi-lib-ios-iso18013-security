@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
 
 let package = Package(
     name: "MdocSecurity18013",
@@ -42,8 +43,7 @@ let package = Package(
         ),
         .binaryTarget(
             name: "EudiEtsi1196x2",
-            url: "https://github.com/eu-digital-identity-wallet/eudi-lib-kmp-etsi-1196x2/releases/download/v0.4.0-alpha.6/EudiEtsi1196x2.xcframework.zip",
-            checksum: "aeddf53cd5094e9a9ef8f34ef687da460bffb1c0a77e29b2a7139d1c9420ed12"
+            path: "EudiEtsi1196x2.xcframework"
         )
     ]
 )
