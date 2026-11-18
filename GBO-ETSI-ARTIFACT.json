@@ -1,0 +1,15 @@
+{
+  "repository": "jeroendk/eudi-lib-kmp-etsi-1196x2",
+  "source_commit": "1df2f4337887373bd1ed7f4682218e7c3454df82",
+  "source_tree": "a906c1b49acf94b66657dcee9309be0460ea91b0",
+  "gradle_version_property": "0.5.0-alpha.1",
+  "release_tag": "v0.5.0-alpha.1-gbo.3",
+  "archive": "EudiEtsi1196x2.xcframework.zip",
+  "checksum": "20e1a5ea2657c714421f463d1420536a85ef8809561a0d991428039d0b2e06de",
+  "url": "https://github.com/jeroendk/eudi-lib-kmp-etsi-1196x2/releases/download/v0.5.0-alpha.1-gbo.3/EudiEtsi1196x2.xcframework.zip",
+  "published": false,
+  "platforms": [
+    "ios-arm64",
+    "ios-arm64-simulator"
+  ]
+}

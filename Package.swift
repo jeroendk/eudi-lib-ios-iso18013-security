@@ -4,6 +4,16 @@
 import PackageDescription
 import Foundation
 
+// Local builds can explicitly opt into an unpublished framework; release consumers
+// use the immutable archive and its verified SwiftPM checksum.
+let etsiFramework: Target = ProcessInfo.processInfo.environment["GBO_USE_LOCAL_ETSI_FRAMEWORK"] == "1"
+    ? .binaryTarget(name: "EudiEtsi1196x2", path: "EudiEtsi1196x2.xcframework")
+    : .binaryTarget(
+        name: "EudiEtsi1196x2",
+        url: "https://github.com/jeroendk/eudi-lib-kmp-etsi-1196x2/releases/download/v0.5.0-alpha.1-gbo.3/EudiEtsi1196x2.xcframework.zip",
+        checksum: "20e1a5ea2657c714421f463d1420536a85ef8809561a0d991428039d0b2e06de"
+    )
+
 let package = Package(
     name: "MdocSecurity18013",
     platforms: [.macOS(.v15), .iOS(.v17), .watchOS(.v10)],
@@ -41,9 +51,6 @@ let package = Package(
             dependencies: ["MdocSecurity18013"],
             resources: [.process("Resources")]
         ),
-        .binaryTarget(
-            name: "EudiEtsi1196x2",
-            path: "EudiEtsi1196x2.xcframework"
-        )
+        etsiFramework
     ]
 )
